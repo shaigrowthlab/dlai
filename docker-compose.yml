@@ -27,13 +27,20 @@ services:
       context: ./backend
     container_name: dl_backend
     restart: unless-stopped
+
+    env_file:
+      - .env
+
     ports:
       - "8000:8000"
+
     volumes:
       - ./backend/app:/app/app
+
     depends_on:
       - postgres
       - qdrant
+
 
 volumes:
   postgres_data:

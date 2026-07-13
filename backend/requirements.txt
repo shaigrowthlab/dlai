@@ -12,6 +12,8 @@ pydantic-settings
 qdrant-client
 httpx
 
+openai
+
 passlib[bcrypt]==1.7.4
 bcrypt==4.1.3
 

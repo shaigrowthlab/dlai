@@ -14,6 +14,15 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # AI Settings
+    AI_PROVIDER: str = "ollama"
+    OLLAMA_URL: str = "http://host.docker.internal:11434"
+    OLLAMA_MODEL: str = "qwen2.5:7b"
+
+    # OpenAI Settings
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-5.5"
+
     # Qdrant
     QDRANT_URL: str = "http://qdrant:6333"
 

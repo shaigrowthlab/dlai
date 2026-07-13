@@ -8,8 +8,10 @@ import app.models
 
 from app.routers.user import router as user_router
 from app.routers.auth import router as auth_router
+from app.routers.chat import router as chat_router
 
 
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -21,6 +23,8 @@ app = FastAPI(
 # Register routers
 app.include_router(user_router)
 app.include_router(auth_router)
+app.include_router(chat_router)
+
 
 @app.get("/")
 def home():

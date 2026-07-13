@@ -11,6 +11,8 @@ pydantic-settings
 
 qdrant-client
 httpx
+beautifulsoup4
+requests
 
 openai
 

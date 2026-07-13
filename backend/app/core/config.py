@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     AI_PROVIDER: str = "ollama"
     OLLAMA_URL: str = "http://host.docker.internal:11434"
     OLLAMA_MODEL: str = "qwen2.5:7b"
+    OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
+
 
     # OpenAI Settings
     OPENAI_API_KEY: str = ""

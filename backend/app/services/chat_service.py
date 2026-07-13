@@ -1,20 +1,72 @@
 from app.ai.factory import get_ai_provider
-from app.chat.memory import add_message, get_messages
+
+from app.chat.memory import (
+    add_message,
+    get_messages,
+)
+
+from app.knowledge.rag_service import (
+    RAGService
+)
+
 from app.schemas.chat import ChatResponse
 
+
 provider = get_ai_provider()
+rag = RAGService()
 
 
-def process_chat(session_id: str, message: str) -> ChatResponse:
-    message = message.strip()
+def process_chat(
+    session_id: str,
+    message: str
+):
 
-    if not message:
-        return ChatResponse(reply="Please enter a message.")
+    add_message(
+        session_id,
+        "user",
+        message
+    )
 
-    add_message(session_id, "user", message)
 
-    reply = provider.chat(get_messages(session_id))
+    knowledge = rag.search(
+        message
+    )
 
-    add_message(session_id, "assistant", reply)
 
-    return ChatResponse(reply=reply)
+    context = "\n\n".join(
+        knowledge
+    )
+
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "Answer using the following "
+                "DigitalLinks knowledge:\n\n"
+                + context
+            ),
+        }
+    ]
+
+
+    messages.extend(
+        get_messages(session_id)
+    )
+
+
+    reply = provider.chat(
+        messages
+    )
+
+
+    add_message(
+        session_id,
+        "assistant",
+        reply
+    )
+
+
+    return ChatResponse(
+        reply=reply
+    )

@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     # AI Provider
     AI_PROVIDER: str = "groq"
 
+    # Chatbot Security
+    CHATBOT_API_KEY: str
+
     # Groq Settings
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "llama-3.3-70b-versatile"

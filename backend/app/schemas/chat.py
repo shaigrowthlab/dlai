@@ -7,4 +7,5 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
+    success: bool = True
     reply: str

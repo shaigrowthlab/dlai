@@ -15,6 +15,7 @@ beautifulsoup4
 requests
 
 openai
+groq
 
 passlib[bcrypt]==1.7.4
 bcrypt==4.1.3

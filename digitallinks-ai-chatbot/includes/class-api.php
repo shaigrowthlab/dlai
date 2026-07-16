@@ -1,56 +1,129 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
 class DL_AI_API {
 
-    public static function init(){
+
+    private static $api_url = 'http://localhost:8000';
+
+
+    public static function init() {
 
         add_action(
-            'rest_api_init',
-            function(){
+            'wp_ajax_dl_ai_chat',
+            array(__CLASS__, 'chat')
+        );
 
-                register_rest_route(
-                    'dlai/v1',
-                    '/chat',
-                    [
-                        'methods'=>'POST',
-                        'callback'=>[
-                            self::class,
-                            'chat'
-                        ],
-                        'permission_callback'=>'__return_true'
-                    ]
-                );
 
-            }
+        add_action(
+            'wp_ajax_nopriv_dl_ai_chat',
+            array(__CLASS__, 'chat')
         );
 
     }
 
 
-    public static function chat($request){
+
+    public static function get_api_url() {
+
+        return self::$api_url;
+
+    }
+
+
+
+    public static function chat() {
+
+
+        check_ajax_referer(
+            'dl_ai_chatbot_nonce',
+            'nonce'
+        );
+
 
         $message = sanitize_text_field(
-            $request['message']
+            $_POST['message'] ?? ''
         );
+
+
+        if (empty($message)) {
+
+            wp_send_json_error(
+                array(
+                    'message'=>'Message required'
+                )
+            );
+
+        }
+
 
 
         $response = wp_remote_post(
-            get_option('dlai_backend_url').'/chat',
-            [
-                'headers'=>[
+
+            self::$api_url . '/chat',
+
+            array(
+
+                'headers'=>array(
                     'Content-Type'=>'application/json'
-                ],
-                'body'=>json_encode([
-                    'message'=>$message
-                ])
-            ]
+                ),
+
+
+                'body'=>json_encode(
+
+                    array(
+
+                        'message'=>$message,
+
+                        'session_id'=>'wordpress-user'
+
+                    )
+
+                ),
+
+
+                'timeout'=>60
+
+            )
+
         );
 
 
-        return json_decode(
-            wp_remote_retrieve_body($response),
-            true
+
+        if(
+            is_wp_error($response)
+        ){
+
+            wp_send_json_error(
+
+                array(
+                    'message'=>$response->get_error_message()
+                )
+
+            );
+
+        }
+
+
+
+        $body = wp_remote_retrieve_body(
+            $response
         );
+
+
+        wp_send_json_success(
+
+            json_decode(
+                $body,
+                true
+            )
+
+        );
+
 
     }
 

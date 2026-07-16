@@ -1,279 +1,363 @@
 (function () {
 
-    "use strict";
+    'use strict';
 
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
 
 
-        const root = document.getElementById(
-            "dl-ai-chatbot-root"
-        );
+            const root =
+                document.getElementById(
+                    'dl-ai-chatbot-root'
+                );
 
 
-        if (!root) {
-            return;
-        }
-
-
-
-        const config = window.DL_AI_CONFIG || {};
-
-
-
-        const chatButton = document.createElement("button");
-
-        chatButton.className = "dl-ai-chat-button";
-
-        chatButton.innerHTML = "💬";
-
-
-
-        const chatBox = document.createElement("div");
-
-        chatBox.className = "dl-ai-chat-box";
-
-        chatBox.innerHTML = `
-
-            <div class="dl-ai-header">
-                <strong>
-                    DigitalLinks AI Assistant
-                </strong>
-
-                <button class="dl-ai-close">
-                    ×
-                </button>
-            </div>
-
-
-            <div class="dl-ai-messages"></div>
-
-
-            <div class="dl-ai-input-area">
-
-                <input 
-                    type="text"
-                    class="dl-ai-input"
-                    placeholder="Ask me anything..."
-                />
-
-
-                <button class="dl-ai-send">
-                    Send
-                </button>
-
-            </div>
-
-        `;
-
-
-
-        root.appendChild(chatButton);
-
-        root.appendChild(chatBox);
-
-
-
-        const closeBtn =
-            chatBox.querySelector(".dl-ai-close");
-
-
-        const sendBtn =
-            chatBox.querySelector(".dl-ai-send");
-
-
-        const input =
-            chatBox.querySelector(".dl-ai-input");
-
-
-        const messages =
-            chatBox.querySelector(".dl-ai-messages");
-
-
-
-
-        chatButton.onclick = function () {
-
-            chatBox.classList.toggle(
-                "active"
-            );
-
-        };
-
-
-
-        closeBtn.onclick = function () {
-
-            chatBox.classList.remove(
-                "active"
-            );
-
-        };
-
-
-
-
-        function addMessage(
-            text,
-            type
-        ) {
-
-
-            const div =
-                document.createElement("div");
-
-
-            div.className =
-                "dl-ai-message " +
-                type;
-
-
-            div.innerText =
-                text;
-
-
-            messages.appendChild(div);
-
-
-            messages.scrollTop =
-                messages.scrollHeight;
-
-        }
-
-
-
-
-        async function sendMessage() {
-
-
-            const message =
-                input.value.trim();
-
-
-
-            if (!message) {
+            if (!root) {
                 return;
             }
 
 
 
-            addMessage(
-                message,
-                "user"
+            root.innerHTML = `
+
+                <button 
+                    id="dl-chatbot-open"
+                    class="dl-chatbot-button">
+                    💬
+                </button>
+
+
+                <div 
+                    id="dl-chatbot-window"
+                    class="dl-chatbot-window">
+
+
+                    <div class="dl-chatbot-header">
+
+                        <span>
+                            DigitalLinks AI Assistant
+                        </span>
+
+
+                        <span 
+                            id="dl-chatbot-close"
+                            class="dl-chatbot-close">
+                            ×
+                        </span>
+
+                    </div>
+
+
+
+                    <div 
+                        id="dl-chatbot-messages"
+                        class="dl-chatbot-messages">
+
+                        <div class="dl-message dl-ai-message">
+
+                            Hi 👋  
+                            How can I help you today?
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="dl-chatbot-input">
+
+
+                        <input 
+                            id="dl-chatbot-input"
+                            type="text"
+                            placeholder="Ask me anything..."
+                        />
+
+
+                        <button 
+                            id="dl-chatbot-send">
+                            Send
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+            `;
+
+
+
+            const openBtn =
+                document.getElementById(
+                    'dl-chatbot-open'
+                );
+
+
+            const closeBtn =
+                document.getElementById(
+                    'dl-chatbot-close'
+                );
+
+
+            const windowBox =
+                document.getElementById(
+                    'dl-chatbot-window'
+                );
+
+
+            const sendBtn =
+                document.getElementById(
+                    'dl-chatbot-send'
+                );
+
+
+            const input =
+                document.getElementById(
+                    'dl-chatbot-input'
+                );
+
+
+            const messages =
+                document.getElementById(
+                    'dl-chatbot-messages'
+                );
+
+
+
+            openBtn.onclick = function () {
+
+                windowBox.style.display =
+                    'flex';
+
+            };
+
+
+
+            closeBtn.onclick = function () {
+
+                windowBox.style.display =
+                    'none';
+
+            };
+
+
+
+            sendBtn.onclick =
+                sendMessage;
+
+
+
+            input.addEventListener(
+                'keypress',
+                function(e){
+
+                    if(e.key === 'Enter'){
+
+                        sendMessage();
+
+                    }
+
+                }
             );
 
 
-            input.value = "";
+
+            function addMessage(
+                text,
+                type
+            ){
 
 
-
-            addMessage(
-                "Typing...",
-                "bot typing"
-            );
-
-
-
-            try {
-
-
-                const response =
-                    await fetch(
-                        config.api_url,
-                        {
-
-                            method: "POST",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-
-                            body:
-                                JSON.stringify({
-
-                                    message:
-                                        message,
-
-                                    site:
-                                        config.site_name
-
-                                })
-
-                        }
+                const div =
+                    document.createElement(
+                        'div'
                     );
 
 
+                div.className =
+                    'dl-message ' +
+                    (
+                        type === 'user'
+                        ?
+                        'dl-user-message'
+                        :
+                        'dl-ai-message'
+                    );
 
-                const data =
-                    await response.json();
+
+                div.innerText =
+                    text;
+
+
+                messages.appendChild(
+                    div
+                );
+
+
+                messages.scrollTop =
+                    messages.scrollHeight;
+
+
+            }
 
 
 
-                messages
-                    .querySelector(".typing")
-                    ?.remove();
+
+
+            function sendMessage(){
+
+
+                const message =
+                    input.value.trim();
+
+
+
+                if(!message){
+
+                    return;
+
+                }
 
 
 
                 addMessage(
-                    data.reply ||
-                    "Sorry, I could not answer.",
-                    "bot"
+                    message,
+                    'user'
                 );
 
 
+                input.value = '';
 
-            } catch (error) {
-
-
-                messages
-                    .querySelector(".typing")
-                    ?.remove();
 
 
                 addMessage(
-                    "Connection error. Please try again.",
-                    "bot"
+                    'Thinking...',
+                    'ai'
                 );
 
 
-                console.error(
-                    error
+
+                const thinking =
+                    messages.lastChild;
+
+
+
+                const formData =
+                    new FormData();
+
+
+
+                formData.append(
+                    'action',
+                    'dl_ai_chat'
                 );
+
+
+                formData.append(
+                    'nonce',
+                    DL_AI_CONFIG.nonce
+                );
+
+
+                formData.append(
+                    'message',
+                    message
+                );
+
+
+
+                fetch(
+                    DL_AI_CONFIG.ajax_url,
+                    {
+
+                        method:'POST',
+
+                        body:formData
+
+                    }
+
+                )
+
+
+                .then(
+                    response =>
+                    response.json()
+                )
+
+
+                .then(
+                    data => {
+
+
+                        thinking.remove();
+
+
+
+                        if(
+                            data.success
+                        ){
+
+
+                            const reply =
+                                data.data.reply ||
+                                data.data.response ||
+                                JSON.stringify(
+                                    data.data
+                                );
+
+
+                            addMessage(
+                                reply,
+                                'ai'
+                            );
+
+
+                        }
+
+                        else {
+
+
+                            addMessage(
+                                'Sorry, something went wrong.',
+                                'ai'
+                            );
+
+
+                        }
+
+
+                    }
+
+                )
+
+
+                .catch(
+                    error => {
+
+
+                        thinking.remove();
+
+
+                        addMessage(
+                            error.message,
+                            'ai'
+                        );
+
+
+                    }
+                );
+
 
             }
 
 
         }
 
-
-
-
-        sendBtn.onclick =
-            sendMessage;
-
-
-
-        input.addEventListener(
-            "keypress",
-            function(e){
-
-                if(e.key === "Enter"){
-
-                    sendMessage();
-
-                }
-
-            }
-        );
-
-
-
-    });
+    );
 
 
 })();
